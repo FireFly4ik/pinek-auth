@@ -1,0 +1,2 @@
+.env
+pkg/jwt/rsa_private.pem
