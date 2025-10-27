@@ -74,11 +74,6 @@ func main() {
 		log.Info().Msg("gRPC server stopped gracefully")
 	}
 
-	err = listener.Close()
-	if err != nil {
-		log.Error().Err(err).Msg("error during listener close")
-	}
-
 	consulProvider.DeregisterService()
 
 	log.Info().Msg("auth service shutdown gracefully")

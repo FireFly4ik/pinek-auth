@@ -48,7 +48,7 @@ func (p *ConsulProvider) registerService(envConf *config.Config) error {
 		CheckID:                        envConf.Consul.CheckId,
 	}
 
-	port, _ := strconv.Atoi(envConf.Port[1:])
+	port, _ := strconv.Atoi(envConf.Port)
 
 	register := &api.AgentServiceRegistration{
 		Address: envConf.Address,
@@ -92,10 +92,4 @@ func (p *ConsulProvider) DeregisterService() {
 	}
 
 	log.Info().Msg("service deregistered from Consul")
-}
-
-func (p *ConsulProvider) GetService(serviceName string) (string, error) {
-	//todo: implement
-
-	return "", nil
 }
