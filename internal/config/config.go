@@ -14,6 +14,7 @@ type Config struct {
 
 	Consul Consul
 	DB     Database
+	JWT    JWT
 }
 
 type Consul struct {
@@ -35,6 +36,11 @@ type Database struct {
 	MaxIdleConns    int
 	MaxOpenConns    int
 	ConnMaxLifetime int
+}
+
+type JWT struct {
+	AccessTTL  string
+	RefreshTTL string
 }
 
 func NewEnvConfig() *Config {
@@ -81,6 +87,11 @@ func NewEnvConfig() *Config {
 			MaxOpenConns:    maxOpenConns,
 			ConnMaxLifetime: connMaxLifetime,
 		},
+
+		JWT: JWT{
+			AccessTTL:  os.Getenv("JWT_ACCESS_TOKEN_TTL"),
+			RefreshTTL: os.Getenv("JWT_REFRESH_TOKEN_TTL"),
+		},
 	}
 }
 
@@ -118,5 +129,10 @@ func PrintConfigWithHiddenSecrets(config *Config) {
 	fmt.Printf("\tMaxIdleConns: %d\n", config.DB.MaxIdleConns)
 	fmt.Printf("\tMaxOpenConns: %d\n", config.DB.MaxOpenConns)
 	fmt.Printf("\tConnMaxLifetime: %d\n", config.DB.ConnMaxLifetime)
+
+	fmt.Println("\nJWT Configuration:")
+	fmt.Printf("\tAccessTTL: %s\n", config.JWT.AccessTTL)
+	fmt.Printf("\tRefreshTTL: %s\n", config.JWT.RefreshTTL)
+
 	fmt.Println("\n===================================")
 }

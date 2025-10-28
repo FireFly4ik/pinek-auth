@@ -5,6 +5,7 @@ import (
 	"auth/internal/consul"
 	"auth/internal/db"
 	grpcService "auth/internal/grpc"
+	"auth/internal/jwt"
 	"auth/internal/logger"
 	pb "auth/internal/proto"
 	"context"
@@ -31,6 +32,8 @@ func main() {
 
 	database := db.ConnectDB(envConf)
 
+	jwtService := jwt.NewJWTService(envConf)
+
 	consulProvider := consul.NewProvider(envConf)
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", envConf.Port))
@@ -38,7 +41,7 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to listen: %v")
 	}
 
-	server := grpcService.NewAuthServer(database, envConf)
+	server := grpcService.NewAuthServer(database, envConf, jwtService)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterAuthServiceServer(grpcServer, server)

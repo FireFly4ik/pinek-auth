@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"auth/internal/config"
+	"auth/internal/jwt"
 	pb "auth/internal/proto"
 	"context"
 	"gorm.io/gorm"
@@ -9,14 +10,16 @@ import (
 
 type AuthServiceServer struct {
 	pb.UnimplementedAuthServiceServer
-	database *gorm.DB
-	envConf  *config.Config
+	database   *gorm.DB
+	envConf    *config.Config
+	jwtService jwt.JWTService
 }
 
-func NewAuthServer(db *gorm.DB, cfg *config.Config) *AuthServiceServer {
+func NewAuthServer(db *gorm.DB, cfg *config.Config, jwtService jwt.JWTService) *AuthServiceServer {
 	return &AuthServiceServer{
-		database: db,
-		envConf:  cfg,
+		database:   db,
+		envConf:    cfg,
+		jwtService: jwtService,
 	}
 }
 
