@@ -30,7 +30,7 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*p
 	return &pb.AuthResponse{Message: "User logged in successfully"}, nil
 }
 
-func (s *AuthServiceServer) RefreshToken(ctx context.Context, req *pb.RefreshRequest) (*pb.AuthResponse, error) {
+func (s *AuthServiceServer) Refresh(ctx context.Context, req *pb.RefreshRequest) (*pb.AuthResponse, error) {
 
 	return &pb.AuthResponse{Message: "Token refreshed successfully"}, nil
 }
