@@ -1,4 +1,4 @@
-package jwt
+package pkg
 
 import (
 	"crypto/rsa"
@@ -10,7 +10,7 @@ import (
 )
 
 func LoadRSAPrivateKey() (*rsa.PrivateKey, error) {
-	data, err := os.ReadFile("rsa_private.pem")
+	data, err := os.ReadFile("keys/rsa_private.pem")
 	if err != nil {
 		return nil, fmt.Errorf("failed to read private key file: %w", err)
 	}
@@ -39,7 +39,7 @@ func LoadRSAPrivateKey() (*rsa.PrivateKey, error) {
 }
 
 func LoadRSAPublicKey() (*rsa.PublicKey, error) {
-	data, err := os.ReadFile("rsa_public.pem")
+	data, err := os.ReadFile("keys/rsa_public.pem")
 	if err != nil {
 		return nil, fmt.Errorf("failed to read public key file: %w", err)
 	}

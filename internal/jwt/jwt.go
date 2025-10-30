@@ -2,7 +2,9 @@ package jwt
 
 import (
 	"auth/internal/config"
+	"auth/pkg"
 	"crypto/rsa"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -10,7 +12,7 @@ import (
 type JWTService interface {
 	GenerateAccessToken(userId, username, role string) (string, error)
 	ValidateAccessToken(tokenStr string) (*AccessClaims, error)
-	GenerateRefreshToken(userId, sessionId string) (string, error)
+	GenerateRefreshToken(userId string) (string, error)
 	ValidateRefreshToken(tokenStr string) (*RefreshClaims, error)
 }
 
@@ -21,12 +23,12 @@ type jwtService struct {
 }
 
 func NewJWTService(envConf *config.Config) JWTService {
-	pubKey, err := LoadRSAPublicKey()
+	pubKey, err := pkg.LoadRSAPublicKey()
 	if err != nil {
-		panic("not existed public key file")
+		panic(fmt.Errorf("not existed public key file: %w", err))
 	}
 
-	priKey, err := LoadRSAPrivateKey()
+	priKey, err := pkg.LoadRSAPrivateKey()
 	if err != nil {
 		panic("not existed private key file")
 	}
@@ -77,15 +79,14 @@ func (s *jwtService) ValidateAccessToken(tokenStr string) (*AccessClaims, error)
 	return claims, nil
 }
 
-func (s *jwtService) GenerateRefreshToken(userID, sessionID string) (string, error) {
+func (s *jwtService) GenerateRefreshToken(userID string) (string, error) {
 	refreshTTL, err := time.ParseDuration(s.envConf.JWT.RefreshTTL)
 	if err != nil {
 		return "", err
 	}
 
 	claims := RefreshClaims{
-		UserID:    userID,
-		SessionID: sessionID,
+		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(refreshTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

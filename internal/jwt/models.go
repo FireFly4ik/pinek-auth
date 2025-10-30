@@ -10,7 +10,6 @@ type AccessClaims struct {
 }
 
 type RefreshClaims struct {
-	SessionID string `json:"session_id"`
-	UserID    string `json:"user_id"`
+	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }

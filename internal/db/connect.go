@@ -10,7 +10,11 @@ import (
 	"time"
 )
 
-func ConnectDB(envConf *config.Config) *gorm.DB {
+type AuthDatabase struct {
+	Database *gorm.DB
+}
+
+func ConnectDB(envConf *config.Config) *AuthDatabase {
 	connectionString := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=UTC",
 		envConf.DB.Host,
@@ -57,5 +61,7 @@ func ConnectDB(envConf *config.Config) *gorm.DB {
 
 	log.Info().Msg("connected to the database successfully")
 
-	return database
+	return &AuthDatabase{
+		Database: database,
+	}
 }
