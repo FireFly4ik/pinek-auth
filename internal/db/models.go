@@ -10,6 +10,7 @@ type Registration struct {
 	Username       string    `gorm:"type:varchar(100);not null"`
 	Login          string    `gorm:"type:varchar(100);uniqueIndex;not null"`
 	HashedPassword string    `gorm:"type:varchar(255);not null"`
+	Role           string    `gorm:"type:text;not null;check:role IN ('user','admin')"`
 	CreatedAt      time.Time `gorm:"type:timestamp;not null"`
 	UpdatedAt      time.Time `gorm:"type:timestamp;not null"`
 }

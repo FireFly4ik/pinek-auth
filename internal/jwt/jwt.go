@@ -12,7 +12,7 @@ import (
 type JWTService interface {
 	GenerateAccessToken(userId, username, role string) (string, error)
 	ValidateAccessToken(tokenStr string) (*AccessClaims, error)
-	GenerateRefreshToken(userId string) (string, error)
+	GenerateRefreshToken(userId string) (time.Time, string, error)
 	ValidateRefreshToken(tokenStr string) (*RefreshClaims, error)
 }
 
@@ -79,22 +79,30 @@ func (s *jwtService) ValidateAccessToken(tokenStr string) (*AccessClaims, error)
 	return claims, nil
 }
 
-func (s *jwtService) GenerateRefreshToken(userID string) (string, error) {
+func (s *jwtService) GenerateRefreshToken(userID string) (time.Time, string, error) {
 	refreshTTL, err := time.ParseDuration(s.envConf.JWT.RefreshTTL)
 	if err != nil {
-		return "", err
+		return time.Time{}, "", err
 	}
+
+	expiresAt := time.Now().Add(refreshTTL)
 
 	claims := RefreshClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(refreshTTL)),
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	return token.SignedString(s.privateKey)
+
+	signedString, err := token.SignedString(s.privateKey)
+	if err != nil {
+		return time.Time{}, "", err
+	}
+
+	return expiresAt, signedString, nil
 }
 
 func (s *jwtService) ValidateRefreshToken(tokenStr string) (*RefreshClaims, error) {
