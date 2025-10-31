@@ -65,3 +65,10 @@ func ConnectDB(envConf *config.Config) *AuthDatabase {
 		Database: database,
 	}
 }
+func (db *AuthDatabase) Close() error {
+	sqlDB, err := db.Database.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

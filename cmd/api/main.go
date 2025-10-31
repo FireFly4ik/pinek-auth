@@ -79,5 +79,10 @@ func main() {
 
 	consulProvider.DeregisterService()
 
+	if err := database.Close(); err != nil {
+		log.Error().Err(err).Msg("failed to close database connection")
+	}
+	log.Info().Msg("database connection closed")
+
 	log.Info().Msg("auth service shutdown gracefully")
 }
