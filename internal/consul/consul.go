@@ -13,6 +13,7 @@ type ConsulProvider struct {
 	client  *api.Client
 	name    string
 	checkId string
+	id      string
 }
 
 func NewProvider(envConf *config.Config) *ConsulProvider {
@@ -26,7 +27,8 @@ func NewProvider(envConf *config.Config) *ConsulProvider {
 		address: envConf.Consul.Address,
 		client:  client,
 		name:    envConf.Consul.Name,
-		checkId: envConf.Consul.CheckId,
+		checkId: envConf.Consul.CheckId + "(" + envConf.Port + ")",
+		id:      envConf.Consul.Name + "(" + envConf.Port + ")",
 	}
 
 	err = cp.registerService(envConf)
@@ -45,7 +47,7 @@ func (p *ConsulProvider) registerService(envConf *config.Config) error {
 		DeregisterCriticalServiceAfter: envConf.Consul.DeregisterTTL,
 		TTL:                            envConf.Consul.RegisterTTL,
 		TLSSkipVerify:                  true,
-		CheckID:                        envConf.Consul.CheckId,
+		CheckID:                        envConf.Consul.CheckId + "(" + envConf.Port + ")",
 	}
 
 	port, _ := strconv.Atoi(envConf.Port)
@@ -53,7 +55,7 @@ func (p *ConsulProvider) registerService(envConf *config.Config) error {
 	register := &api.AgentServiceRegistration{
 		Address: envConf.Address,
 		Port:    port,
-		ID:      envConf.Consul.Name,
+		ID:      envConf.Consul.Name + "(" + envConf.Port + ")",
 		Name:    envConf.Consul.Name,
 		Tags:    []string{"auth"},
 		Check:   check,
@@ -86,7 +88,7 @@ func (p *ConsulProvider) updateHealthCheck(envConf *config.Config) {
 }
 
 func (p *ConsulProvider) DeregisterService() {
-	err := p.client.Agent().ServiceDeregister(p.name)
+	err := p.client.Agent().ServiceDeregister(p.id)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to deregister service from Consul")
 	}
