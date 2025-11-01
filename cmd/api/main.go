@@ -35,6 +35,7 @@ func main() {
 	jwtService := jwt.NewJWTService(envConf)
 
 	consulProvider := consul.NewProvider(envConf)
+	log.Info().Msg("service registered in Consul")
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", envConf.Port))
 	if err != nil {
