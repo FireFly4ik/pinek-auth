@@ -77,12 +77,22 @@ func (p *ConsulProvider) updateHealthCheck(envConf *config.Config) {
 	}
 
 	ticker := time.NewTicker(ttl)
+	errors := 0
 
 	for {
 		err = p.client.Agent().UpdateTTL(p.checkId, "online", api.HealthPassing)
 		if err != nil {
+			errors++
+			if errors == 10 {
+				err := p.registerService(envConf)
+				if err != nil {
+					panic("Consul is not working or no internet connection")
+				}
+				errors = 0
+			}
 			log.Error().Err(err).Msg("Failed to update Consul health check")
 		}
+		errors = 0
 		<-ticker.C
 	}
 }
